@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SpecView</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🖥️</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #030b12;
+      --bg2:     #061520;
+      --bg3:     #0a1f2e;
+      --border:  rgba(0,212,255,.12);
+      --border2: rgba(0,212,255,.3);
+      --neon:    #00d4ff;
+      --neon2:   #00ff88;
+      --neon3:   #ff6b35;
+      --neon4:   #a855f7;
+      --gold:    #ffd700;
+      --text:    #c8e6f5;
+      --text2:   #6fb8d4;
+      --text3:   #3d7a94;
+      --fd:      'Orbitron', monospace;
+      --fb:      'Rajdhani', sans-serif;
+      --fm:      'Share Tech Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--fb);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Scanlines */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 2px,
+        rgba(0,212,255,0.012) 2px, rgba(0,212,255,0.012) 4px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* Grid bg */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,212,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,255,.025) 1px, transparent 1px);
+      background-size: 44px 44px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(3,11,18,0.97);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border2);
+      display: flex; align-items: center;
+      padding: 0 48px; height: 58px; gap: 32px;
+    }
+
+    .logo {
+      display: flex; align-items: center; gap: 12px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .logo-icon {
+      width: 32px; height: 32px;
+      border: 1.5px solid var(--neon);
+      display: grid; place-items: center;
+      font-family: var(--fd);
+      font-size: 0.5rem;
+      color: var(--neon);
+      letter-spacing: 0.05em;
+      position: relative;
+    }
+    .logo-icon::before, .logo-icon::after {
+      content: '';
+      position: absolute;
+      width: 5px; height: 5px;
+      border: 1px solid var(--neon);
+    }
+    .logo-icon::before { top: -3px; left: -3px; border-right: none; border-bottom: none; }
+    .logo-icon::after  { bottom: -3px; right: -3px; border-left: none; border-top: none; }
+    .logo-text {
+      font-family: var(--fd);
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      color: #fff;
+    }
+    .logo-text span { color: var(--neon); }
+    .logo-sub {
+      font-family: var(--fm);
+      font-size: 0.55rem;
+      color: var(--text3);
+      letter-spacing: 0.15em;
+      margin-top: 2px;
+    }
+
+    nav { display: flex; gap: 2px; margin-left: auto; }
+    .tab {
+      font-family: var(--fm);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      padding: 0 22px;
+      height: 58px;
+      display: flex; align-items: center;
+      color: var(--text3);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+      user-select: none;
+      white-space: nowrap;
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--neon); border-bottom-color: var(--neon); }
+    .tab-badge {
+      background: var(--neon);
+      color: var(--bg);
+      font-size: 0.5rem;
+      padding: 1px 5px;
+      margin-left: 7px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── PAGES ── */
+    .page { display: none; position: relative; z-index: 10; }
+    .page.active { display: block; }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 64px 48px 48px;
+      position: relative; overflow: hidden;
+    }
+    .hero-bg-glow {
+      position: absolute; top: -80px; left: 50%;
+      transform: translateX(-50%);
+      width: 900px; height: 500px;
+      background: radial-gradient(ellipse, rgba(0,212,255,0.05) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      font-family: var(--fm);
+      font-size: 0.62rem;
+      letter-spacing: 0.3em;
+      color: var(--neon);
+      margin-bottom: 14px;
+      display: flex; align-items: center; gap: 10px;
+      opacity: 0; animation: fadeUp 0.5s 0.05s forwards;
+    }
+    .hero-eyebrow::before { content: ''; width: 20px; height: 1px; background: var(--neon); }
+    .hero-title {
+      font-family: var(--fd);
+      font-size: clamp(2.4rem, 7vw, 5.5rem);
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      line-height: 1;
+      margin-bottom: 18px;
+      opacity: 0; animation: fadeUp 0.6s 0.15s forwards;
+    }
+    .hero-title .accent { color: var(--neon); }
+    .hero-desc {
+      font-size: 1rem;
+      font-weight: 300;
+      color: var(--text2);
+      max-width: 540px;
+      line-height: 1.8;
+      margin-bottom: 32px;
+      opacity: 0; animation: fadeUp 0.5s 0.25s forwards;
+    }
+    .hero-chips {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      opacity: 0; animation: fadeUp 0.5s 0.35s forwards;
+    }
+    .chip {
+      font-family: var(--fm);
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      padding: 5px 12px;
+      border: 1px solid var(--border2);
+      color: var(--text3);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .chip .live-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--neon2);
+      box-shadow: 0 0 6px var(--neon2);
+      animation: pulse 1.5s infinite;
+    }
+
+    /* ── SCREENSHOTS ── */
+    .sec-label {
+      font-family: var(--fm);
+      font-size: 0.62rem;
+      letter-spacing: 0.25em;
+      color: var(--neon);
+      margin-bottom: 16px;
+      display: flex; align-items: center; gap: 12px;
+      padding: 0 48px;
+    }
+    .sec-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border2), transparent); }
+
+    .screenshots {
+      display: flex; gap: 10px;
+      overflow-x: auto; padding: 0 48px 8px;
+      scrollbar-width: thin; scrollbar-color: var(--border2) transparent;
+      margin-bottom: 56px;
+    }
+    .screenshots::-webkit-scrollbar { height: 3px; }
+    .screenshots::-webkit-scrollbar-thumb { background: var(--border2); }
+    .ss {
+      flex-shrink: 0; width: 220px; height: 130px;
+      border: 1px solid var(--border); overflow: hidden;
+      cursor: pointer; position: relative;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .ss:hover { border-color: var(--neon); transform: translateY(-3px); }
+    .ss img { width: 100%; height: 100%; object-fit: cover; object-position: top left; }
+    .ss-lbl {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: rgba(3,11,18,0.88);
+      font-family: var(--fm); font-size: 0.58rem;
+      letter-spacing: 0.1em; color: var(--text3);
+      padding: 4px 8px;
+      opacity: 0; transition: opacity 0.2s;
+    }
+    .ss:hover .ss-lbl { opacity: 1; }
+
+    /* ── DOWNLOADS TABLE ── */
+    .dl-section { padding: 0 48px 80px; }
+
+    .dl-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+    }
+    .dl-count {
+      font-family: var(--fm);
+      font-size: 0.62rem;
+      letter-spacing: 0.15em;
+      color: var(--text3);
+    }
+    .dl-count span { color: var(--neon); }
+
+    /* Table */
+    .dl-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid var(--border);
+    }
+    .dl-table thead {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border2);
+    }
+    .dl-table th {
+      font-family: var(--fm);
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      color: var(--text3);
+      padding: 12px 20px;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .dl-table th:last-child { text-align: right; }
+
+    .dl-row {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+      cursor: pointer;
+    }
+    .dl-row:last-child { border-bottom: none; }
+    .dl-row:hover { background: var(--bg2); }
+    .dl-row.latest-row { background: rgba(0,212,255,0.03); }
+
+    .dl-row td {
+      padding: 16px 20px;
+      vertical-align: middle;
+    }
+
+    /* Col: nome */
+    .col-name {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .ver-icon {
+      width: 32px; height: 32px; flex-shrink: 0;
+      border: 1px solid var(--border);
+      display: grid; place-items: center;
+      font-family: var(--fd);
+      font-size: 0.5rem;
+      color: var(--text3);
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .dl-row:hover .ver-icon,
+    .dl-row.latest-row .ver-icon { border-color: var(--neon); color: var(--neon); }
+    .ver-title {
+      font-family: var(--fd);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      color: var(--text);
+      transition: color 0.2s;
+    }
+    .dl-row:hover .ver-title { color: var(--neon); }
+    .ver-sub {
+      font-family: var(--fm);
+      font-size: 0.6rem;
+      color: var(--text3);
+      margin-top: 2px;
+      letter-spacing: 0.05em;
+    }
+
+    /* Col: tag */
+    .tag {
+      font-family: var(--fm);
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+      padding: 3px 9px;
+      border: 1px solid;
+      display: inline-block;
+      white-space: nowrap;
+    }
+    .tag.latest  { color: var(--neon);  border-color: rgba(0,212,255,.4);  background: rgba(0,212,255,.07); }
+    .tag.stable  { color: var(--neon2); border-color: rgba(0,255,136,.3);  background: rgba(0,255,136,.06); }
+    .tag.beta    { color: var(--neon4); border-color: rgba(168,85,247,.3); background: rgba(168,85,247,.06); }
+    .tag.legacy  { color: var(--text3); border-color: var(--border);       background: transparent; }
+
+    /* Col: changelog */
+    .changelog-cell {
+      font-family: var(--fm);
+      font-size: 0.66rem;
+      color: var(--text3);
+      line-height: 1.9;
+      max-width: 340px;
+    }
+    .changelog-cell span {
+      display: inline-flex; align-items: center; gap: 4px;
+      margin-right: 12px;
+      white-space: nowrap;
+    }
+    .changelog-cell span::before { content: '→'; color: var(--neon); opacity: 0.5; }
+
+    /* Col: tamanho / data */
+    .meta-cell {
+      font-family: var(--fm);
+      font-size: 0.65rem;
+      color: var(--text3);
+      white-space: nowrap;
+    }
+    .meta-cell .size { color: var(--text2); margin-bottom: 2px; }
+
+    /* Col: botão */
+    .btn-dl {
+      font-family: var(--fm);
+      font-size: 0.62rem;
+      letter-spacing: 0.15em;
+      padding: 9px 18px;
+      border: 1px solid var(--border2);
+      background: transparent;
+      color: var(--neon);
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+      text-decoration: none;
+      display: inline-flex; align-items: center; gap: 8px;
+      position: relative; overflow: hidden;
+    }
+    .btn-dl::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: var(--neon);
+      transform: translateX(-101%);
+      transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
+    }
+    .btn-dl:hover { color: var(--bg); border-color: var(--neon); }
+    .btn-dl:hover::before { transform: translateX(0); }
+    .btn-dl span { position: relative; z-index: 1; }
+    .btn-dl.latest-btn {
+      border-color: var(--neon);
+      background: rgba(0,212,255,0.05);
+    }
+
+    td:last-child { text-align: right; }
+
+    /* ── HELP PAGE ── */
+    .help-container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 56px 48px 80px;
+    }
+    .help-page-title {
+      font-family: var(--fd);
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      line-height: 1;
+      margin-bottom: 8px;
+      opacity: 0;
+    }
+    .help-page-title.vis { animation: fadeUp 0.5s forwards; }
+    .help-page-title .ac { color: var(--neon); }
+    .help-page-sub {
+      font-family: var(--fm);
+      font-size: 0.65rem;
+      color: var(--text3);
+      letter-spacing: 0.15em;
+      margin-bottom: 48px;
+      opacity: 0;
+    }
+    .help-page-sub.vis { animation: fadeUp 0.5s 0.1s forwards; }
+
+    .help-block {
+      margin-bottom: 44px;
+      opacity: 0;
+    }
+    .help-block.vis { animation: fadeUp 0.5s forwards; }
+
+    .help-block-title {
+      font-family: var(--fm);
+      font-size: 0.62rem;
+      letter-spacing: 0.25em;
+      color: var(--neon);
+      margin-bottom: 14px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .help-block-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border2), transparent); }
+
+    /* Steps */
+    .steps { display: flex; flex-direction: column; gap: 2px; }
+    .step-row {
+      display: flex; gap: 18px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      padding: 18px 20px;
+      transition: border-color 0.2s;
+      position: relative;
+    }
+    .step-row::before {
+      content: '';
+      position: absolute; top: 0; left: 0; bottom: 0;
+      width: 2px; background: var(--neon);
+      transform: scaleY(0); transform-origin: top;
+      transition: transform 0.3s;
+    }
+    .step-row:hover { border-color: var(--border2); }
+    .step-row:hover::before { transform: scaleY(1); }
+    .step-n {
+      font-family: var(--fd);
+      font-size: 0.7rem;
+      color: var(--neon);
+      opacity: 0.4;
+      min-width: 28px;
+      padding-top: 2px;
+    }
+    .step-t { font-family: var(--fb); font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+    .step-d { font-family: var(--fm); font-size: 0.68rem; color: var(--text3); line-height: 1.9; }
+    .step-code {
+      margin-top: 8px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      padding: 7px 12px;
+      font-family: var(--fm);
+      font-size: 0.68rem;
+      color: var(--neon2);
+      display: inline-block;
+    }
+
+    /* FAQ */
+    .faq { display: flex; flex-direction: column; gap: 2px; }
+    .faq-item { border: 1px solid var(--border); }
+    .faq-q {
+      padding: 14px 18px;
+      cursor: pointer;
+      font-family: var(--fb); font-size: 0.9rem; font-weight: 600;
+      color: var(--text);
+      display: flex; justify-content: space-between; align-items: center;
+      transition: background 0.2s; user-select: none;
+    }
+    .faq-q:hover { background: var(--bg2); }
+    .faq-q::after { content: '+'; font-family: var(--fm); color: var(--text3); font-size: 1.1rem; transition: transform 0.3s, color 0.2s; }
+    .faq-item.open .faq-q::after { transform: rotate(45deg); color: var(--neon); }
+    .faq-a { max-height: 0; overflow: hidden; transition: max-height 0.35s cubic-bezier(0.16,1,0.3,1), padding 0.3s; font-family: var(--fm); font-size: 0.7rem; color: var(--text3); line-height: 1.9; padding: 0 18px; }
+    .faq-item.open .faq-a { max-height: 300px; padding: 0 18px 14px; }
+
+    /* Req table */
+    .req-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); }
+    .req-col { background: var(--bg2); padding: 20px; }
+    .req-col-title { font-family: var(--fm); font-size: 0.6rem; letter-spacing: 0.2em; color: var(--neon); margin-bottom: 14px; }
+    .req-r { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 0.82rem; }
+    .req-r:last-child { border-bottom: none; }
+    .req-k { color: var(--text3); font-family: var(--fm); font-size: 0.65rem; }
+    .req-v { color: var(--text); font-weight: 600; }
+
+    /* LIGHTBOX */
+    .lightbox { position: fixed; inset: 0; background: rgba(3,11,18,0.96); z-index: 1000; display: none; place-items: center; cursor: zoom-out; }
+    .lightbox.open { display: grid; }
+    .lightbox img { max-width: 90vw; max-height: 86vh; border: 1px solid var(--border2); }
+    .lb-close { position: absolute; top: 18px; right: 22px; font-family: var(--fm); font-size: 0.65rem; color: var(--text3); letter-spacing: 0.15em; cursor: pointer; padding: 7px 14px; border: 1px solid var(--border2); }
+    .lb-close:hover { color: var(--text); border-color: var(--text3); }
+
+    /* FOOTER */
+    footer {
+      position: relative; z-index: 10;
+      border-top: 1px solid var(--border);
+      padding: 22px 48px;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+    }
+    .ft { font-family: var(--fm); font-size: 0.6rem; color: var(--text3); letter-spacing: 0.08em; }
+    .ft span { color: var(--neon); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; } 50% { opacity: 0.3; }
+    }
+
+    @media (max-width: 800px) {
+      header { padding: 0 16px; }
+      .hero, .dl-section { padding-left: 16px; padding-right: 16px; }
+      .sec-label, .screenshots { padding-left: 16px; padding-right: 16px; }
+      .help-container { padding: 40px 16px 60px; }
+      footer { padding: 18px 16px; }
+      .changelog-cell { display: none; }
+      .meta-cell { display: none; }
+      .req-grid { grid-template-columns: 1fr; }
+      .dl-table th:nth-child(3),
+      .dl-table th:nth-child(4) { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLb()">
+  <div class="lb-close" onclick="closeLb()">ESC / FECHAR</div>
+  <img id="lb-img" src="" alt="" />
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">SV</div>
+    <div>
+      <div class="logo-text">SPEC<span>VIEW</span></div>
+      <div class="logo-sub">HARDWARE MONITOR</div>
+    </div>
+  </div>
+  <nav>
+    <div class="tab active" onclick="switchTab('downloads')" id="tab-downloads">
+      DOWNLOADS <span class="tab-badge">10</span>
+    </div>
+    <div class="tab" onclick="switchTab('help')" id="tab-help">AJUDA</div>
+  </nav>
+</header>
+
+<!-- ══════════════════ DOWNLOADS PAGE -->
+<div class="page active" id="page-downloads">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-bg-glow"></div>
+    <div class="hero-eyebrow">// monitor de hardware para windows</div>
+    <h1 class="hero-title">SPEC<span class="accent">VIEW</span><br>DOWNLOADS.</h1>
+    <p class="hero-desc">Todas as versões do SpecView em um só lugar. Escolha a versão desejada e clique em baixar.</p>
+    <div class="hero-chips">
+      <div class="chip"><span class="live-dot"></span>AO VIVO</div>
+      <div class="chip">WINDOWS 10 / 11</div>
+      <div class="chip">GRATUITO</div>
+      <div class="chip">x64</div>
+      <div class="chip">ELECTRON</div>
+    </div>
+  </div>
+
+  <!-- SCREENSHOTS -->
+  <div class="sec-label" style="margin-top: 8px;">CAPTURAS DE TELA</div>
+  <div class="screenshots">
+    <div class="ss" onclick="openLb(this)"><img src="VG.png" alt="Visão Geral"/><div class="ss-lbl">VISÃO GERAL</div></div>
+    <div class="ss" onclick="openLb(this)"><img src="CPU.png" alt="Processador"/><div class="ss-lbl">PROCESSADOR</div></div>
+    <div class="ss" onclick="openLb(this)"><img src="RAM.png" alt="Memória RAM"/><div class="ss-lbl">MEMÓRIA RAM</div></div>
+    <div class="ss" onclick="openLb(this)"><img src="GC.png" alt="Placa de Vídeo"/><div class="ss-lbl">PLACA DE VÍDEO</div></div>
+    <div class="ss" onclick="openLb(this)"><img src="STORE.png" alt="Armazenamento"/><div class="ss-lbl">ARMAZENAMENTO</div></div>
+    <div class="ss" onclick="openLb(this)"><img src="REDE.png" alt="Rede"/><div class="ss-lbl">REDE</div></div>
+    <div class="ss" onclick="openLb(this)"><img src="TEMP.png" alt="Temperatura"/><div class="ss-lbl">TEMPERATURA</div></div>
+    <div class="ss" onclick="openLb(this)"><img src="GAME.png" alt="Jogos"/><div class="ss-lbl">COMPATIB. DE JOGOS</div></div>
+    <div class="ss" onclick="openLb(this)"><img src="BENCH.png" alt="Benchmark"/><div class="ss-lbl">BENCHMARK</div></div>
+  </div>
+
+  <!-- DOWNLOADS TABLE -->
+  <div class="sec-label">VERSÕES DISPONÍVEIS</div>
+  <div class="dl-section">
+    <div class="dl-header">
+      <div class="dl-count"><span>10</span> VERSÕES DISPONÍVEIS — TODAS GRATUITAS</div>
+    </div>
+
+    <table class="dl-table">
+      <thead>
+        <tr>
+          <th>VERSÃO</th>
+          <th>STATUS</th>
+          <th>O QUE HÁ DE NOVO</th>
+          <th>TAMANHO / DATA</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="dl-tbody">
+        <!-- Gerado via JS -->
+      </tbody>
+    </table>
+  </div>
+
+</div><!-- /page-downloads -->
+
+<!-- ══════════════════ HELP PAGE -->
+<div class="page" id="page-help">
+  <div class="help-container">
+
+    <h2 class="help-page-title">CENTRAL DE<br><span class="ac">AJUDA.</span></h2>
+    <p class="help-page-sub">// documentação e suporte do specview</p>
+
+    <!-- INSTALAÇÃO -->
+    <div class="help-block">
+      <div class="help-block-title">INSTALAÇÃO</div>
+      <div class="steps">
+        <div class="step-row">
+          <div class="step-n">01</div>
+          <div>
+            <div class="step-t">Baixe a versão desejada</div>
+            <div class="step-d">Na aba Downloads, localize a versão e clique em "Baixar". O arquivo será salvo na sua pasta de Downloads.</div>
+          </div>
+        </div>
+        <div class="step-row">
+          <div class="step-n">02</div>
+          <div>
+            <div class="step-t">Execute o arquivo</div>
+            <div class="step-d">Dê dois cliques no arquivo baixado. O SpecView roda diretamente — sem instalação necessária.</div>
+          </div>
+        </div>
+        <div class="step-row">
+          <div class="step-n">03</div>
+          <div>
+            <div class="step-t">Para temperatura, execute como Administrador</div>
+            <div class="step-d">Clique com o botão direito em <code style="color:var(--neon)">iniciar.bat</code> e selecione "Executar como administrador". Isso libera o acesso aos sensores de temperatura.</div>
+            <div class="step-code">→ Clique direito em iniciar.bat → Executar como administrador</div>
+          </div>
+        </div>
+        <div class="step-row">
+          <div class="step-n">04</div>
+          <div>
+            <div class="step-t">Aguarde o carregamento inicial</div>
+            <div class="step-d">Na primeira execução, o SpecView pode levar alguns segundos para coletar os dados. O indicador "AO VIVO" no canto superior direito confirma que a leitura está ativa.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEMPERATURA N/A -->
+    <div class="help-block">
+      <div class="help-block-title">TEMPERATURA — N/A</div>
+      <div class="steps">
+        <div class="step-row">
+          <div class="step-n">!</div>
+          <div>
+            <div class="step-t">Por que aparece N/A na temperatura?</div>
+            <div class="step-d">A leitura de temperatura exige permissões elevadas no Windows. Se você abriu o SpecView normalmente, os sensores não ficam acessíveis. Feche o app e reabra via <code style="color:var(--neon)">iniciar.bat</code> como administrador para resolver.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FPS EM JOGOS -->
+    <div class="help-block">
+      <div class="help-block-title">VER FPS EM JOGOS</div>
+      <div class="steps">
+        <div class="step-row">
+          <div class="step-n">01</div>
+          <div>
+            <div class="step-t">Instale o MSI Afterburner + RivaTuner</div>
+            <div class="step-d">Baixe em <span style="color:var(--neon)">msi.com/Landing/afterburner</span>. O RivaTuner Statistics Server é incluído automaticamente na instalação.</div>
+          </div>
+        </div>
+        <div class="step-row">
+          <div class="step-n">02</div>
+          <div>
+            <div class="step-t">Configure o RivaTuner</div>
+            <div class="step-d">Abra o RivaTuner e ative a opção <strong style="color:var(--text)">Show On-Screen Display</strong>.</div>
+          </div>
+        </div>
+        <div class="step-row">
+          <div class="step-n">03</div>
+          <div>
+            <div class="step-t">Configure o Afterburner</div>
+            <div class="step-d">Vá em Configurações → Monitoramento, marque <strong style="color:var(--text)">Framerate</strong> e ative "Mostrar no OSD".</div>
+          </div>
+        </div>
+        <div class="step-row">
+          <div class="step-n">04</div>
+          <div>
+            <div class="step-t">Abra qualquer jogo</div>
+            <div class="step-d">O FPS aparecerá no canto da tela em tempo real, diretamente dentro do jogo.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REQUISITOS -->
+    <div class="help-block">
+      <div class="help-block-title">REQUISITOS DO SISTEMA</div>
+      <div class="req-grid">
+        <div class="req-col">
+          <div class="req-col-title">MÍNIMO</div>
+          <div class="req-r"><span class="req-k">Sistema</span><span class="req-v">Windows 10 x64</span></div>
+          <div class="req-r"><span class="req-k">RAM</span><span class="req-v">4 GB</span></div>
+          <div class="req-r"><span class="req-k">Armazenamento</span><span class="req-v">200 MB</span></div>
+          <div class="req-r"><span class="req-k">Runtime</span><span class="req-v">Node.js v18+</span></div>
+        </div>
+        <div class="req-col">
+          <div class="req-col-title">RECOMENDADO</div>
+          <div class="req-r"><span class="req-k">Sistema</span><span class="req-v">Windows 11 x64</span></div>
+          <div class="req-r"><span class="req-k">RAM</span><span class="req-v">8 GB</span></div>
+          <div class="req-r"><span class="req-k">Armazenamento</span><span class="req-v">500 MB</span></div>
+          <div class="req-r"><span class="req-k">Permissão</span><span class="req-v">Administrador</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="help-block">
+      <div class="help-block-title">PERGUNTAS FREQUENTES</div>
+      <div class="faq">
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">O SpecView é gratuito?</div>
+          <div class="faq-a">Sim, todas as versões são completamente gratuitas para uso pessoal.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">Por que a GPU aparece como Intel Iris Xe e não minha placa dedicada?</div>
+          <div class="faq-a">O SpecView exibe a GPU reportada como padrão pelo sistema. Em notebooks com GPU integrada e dedicada, o Windows pode reportar a integrada como principal. Isso é um comportamento do driver, não um bug do SpecView.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">Posso ter várias versões instaladas ao mesmo tempo?</div>
+          <div class="faq-a">Sim, cada versão é um arquivo independente. Você pode manter múltiplas versões na mesma máquina sem nenhum conflito.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">O SpecView afeta a performance do PC?</div>
+          <div class="faq-a">O impacto é mínimo — consumo de CPU abaixo de 2% em uso normal. Você pode conferir isso na própria lista de processos dentro do SpecView (o processo electron.exe).</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">Como reportar um bug ou sugerir uma funcionalidade?</div>
+          <div class="faq-a">Abra uma issue no repositório do GitHub do projeto. Inclua detalhes do seu hardware, versão do Windows e passos para reproduzir o problema.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /page-help -->
+
+<footer>
+  <div class="ft"><span>SPECVIEW</span> — Monitor de Hardware Windows · Desenvolvido por <span>MZ Apps</span></div>
+  <div class="ft">© 2025 · Todas as versões gratuitas</div>
+</footer>
+
+<script>
+  // ─────────────────────
+  // DADOS DAS VERSÕES
+  // ─────────────────────
+  const versions = [
+    { v: 10, tag: 'latest', date: 'Abr 2025', size: '28 KB',
+      log: ['Versão mais estável', 'Suporte Win11 Build 26200', 'Swap memory tracking', 'Melhorias de acessibilidade'] },
+    { v: 9,  tag: 'stable', date: 'Fev 2025', size: '26 KB',
+      log: ['Redesign visual completo', 'Info de placa-mãe', 'Performance otimizada'] },
+    { v: 8,  tag: 'stable', date: 'Dez 2024', size: '24 KB',
+      log: ['Módulo de benchmark', 'Score CPU e memória', 'Correções de estabilidade'] },
+    { v: 7,  tag: 'beta',   date: 'Out 2024', size: '22 KB',
+      log: ['Compatibilidade de jogos', 'Busca por título', 'Sugestões populares'] },
+    { v: 6,  tag: 'beta',   date: 'Ago 2024', size: '20 KB',
+      log: ['Aba armazenamento', 'Detecção SSD/HDD', 'Interface NVMe'] },
+    { v: 5,  tag: 'legacy', date: 'Jun 2024', size: '21 KB',
+      log: ['Módulo de rede', 'Download/Upload em tempo real', 'Info de interface'] },
+    { v: 4,  tag: 'legacy', date: 'Abr 2024', size: '16 KB',
+      log: ['Aba de temperatura', 'Top processos', 'Filtro de processos'] },
+    { v: 3,  tag: 'legacy', date: 'Mar 2024', size: '16 KB',
+      log: ['Histórico em gráfico', 'Suporte multi-núcleo', 'Barra de status'] },
+    { v: 2,  tag: 'legacy', date: 'Fev 2024', size: '17 KB',
+      log: ['Adicionada aba GPU', 'Melhorias de layout', 'Correção de bugs'] },
+    { v: 1,  tag: 'legacy', date: 'Jan 2024', size: '14 KB',
+      log: ['Versão inicial', 'CPU e RAM básico', 'Layout inicial'] },
+  ];
+
+  // ─────────────────────
+  // RENDERIZA TABELA
+  // ─────────────────────
+  const tbody = document.getElementById('dl-tbody');
+
+  versions.forEach(ver => {
+    const isLatest = ver.tag === 'latest';
+    const name = `SpecView-v${ver.v}`;
+
+    const tr = document.createElement('tr');
+    tr.className = 'dl-row' + (isLatest ? ' latest-row' : '');
+
+    tr.innerHTML = `
+      <td>
+        <div class="col-name">
+          <div class="ver-icon">v${ver.v}</div>
+          <div>
+            <div class="ver-title">${name}</div>
+            <div class="ver-sub">Windows x64</div>
+          </div>
+        </div>
+      </td>
+      <td><span class="tag ${ver.tag}">${ver.tag.toUpperCase()}</span></td>
+      <td class="changelog-cell">
+        ${ver.log.map(l => `<span>${l}</span>`).join('')}
+      </td>
+      <td class="meta-cell">
+        <div class="size">${ver.size}</div>
+        <div>${ver.date}</div>
+      </td>
+      <td>
+        <a href="${name}.zip" download="${name}.zip" class="btn-dl${isLatest ? ' latest-btn' : ''}">
+          <span>⬇ BAIXAR</span>
+        </a>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // ─────────────────────
+  // TABS
+  // ─────────────────────
+  function switchTab(id) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    document.getElementById('page-' + id).classList.add('active');
+
+    if (id === 'help') {
+      setTimeout(() => {
+        document.querySelector('.help-page-title').classList.add('vis');
+        document.querySelector('.help-page-sub').classList.add('vis');
+        document.querySelectorAll('.help-block').forEach((el, i) => {
+          setTimeout(() => el.classList.add('vis'), 120 + i * 70);
+        });
+      }, 40);
+    }
+  }
+
+  // ─────────────────────
+  // LIGHTBOX
+  // ─────────────────────
+  function openLb(el) {
+    document.getElementById('lb-img').src = el.querySelector('img').src;
+    document.getElementById('lightbox').classList.add('open');
+  }
+  function closeLb() {
+    document.getElementById('lightbox').classList.remove('open');
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLb(); });
+
+  // ─────────────────────
+  // FAQ
+  // ─────────────────────
+  function toggleFaq(el) {
+    const item = el.parentElement;
+    const open = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!open) item.classList.add('open');
+  }
+</script>
+
+</body>
+</html>
