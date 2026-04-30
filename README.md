@@ -93,5 +93,4 @@ Algumas leituras de sensores podem retornar **N/A** quando o app não está com 
 
 ## Licença
 
-O app declara licença **MIT** em `SpecView-v5/specview5/package.json`.
-
+O app declara licença **MIT**.
