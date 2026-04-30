@@ -1,0 +1,12 @@
+{
+  "name": "specview-downloads",
+  "version": "1.0.0",
+  "description": "SpecView – Site de downloads do monitor de hardware",
+  "scripts": {
+    "start": "npx serve .",
+    "build": "echo 'Site estático, nenhum build necessário.'"
+  },
+  "devDependencies": {
+    "serve": "^14.2.3"
+  }
+}
