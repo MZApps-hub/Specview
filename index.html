@@ -1,244 +1,418 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SpecView</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🖥️</text></svg>">
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-
-<!-- LIGHTBOX -->
-<div class="lightbox" id="lightbox" onclick="closeLb()">
-  <div class="lb-close" onclick="closeLb()">ESC / FECHAR</div>
-  <img id="lb-img" src="" alt="" />
-</div>
-
-<!-- HEADER -->
-<header>
-  <div class="logo">
-    <div class="logo-icon">SV</div>
-    <div>
-      <div class="logo-text">SPEC<span>VIEW</span></div>
-      <div class="logo-sub">HARDWARE MONITOR</div>
-    </div>
-  </div>
-  <nav>
-    <div class="tab active" onclick="switchTab('downloads')" id="tab-downloads">
-      DOWNLOADS <span class="tab-badge">10</span>
-    </div>
-    <div class="tab" onclick="switchTab('help')" id="tab-help">AJUDA</div>
-  </nav>
-</header>
-
-<!-- ══════════════════ DOWNLOADS PAGE -->
-<div class="page active" id="page-downloads">
-
-  <!-- HERO -->
-  <div class="hero">
-    <div class="hero-bg-glow"></div>
-    <div class="hero-eyebrow">// monitor de hardware para windows</div>
-    <h1 class="hero-title">SPEC<span class="accent">VIEW</span><br>DOWNLOADS.</h1>
-    <p class="hero-desc">Todas as versões do SpecView em um só lugar. Escolha a versão desejada e clique em baixar.</p>
-    <div class="hero-chips">
-      <div class="chip"><span class="live-dot"></span>AO VIVO</div>
-      <div class="chip">WINDOWS 10 / 11</div>
-      <div class="chip">GRATUITO</div>
-      <div class="chip">x64</div>
-      <div class="chip">ELECTRON</div>
-    </div>
-  </div>
-
-  <!-- SCREENSHOTS -->
-  <div class="sec-label" style="margin-top: 8px;">CAPTURAS DE TELA</div>
-  <div class="screenshots">
-    <div class="ss" onclick="openLb(this)"><img src="Imagens/IVG.png" alt="Visão Geral"/><div class="ss-lbl">VISÃO GERAL</div></div>
-    <div class="ss" onclick="openLb(this)"><img src="Imagens/ICPU.png" alt="Processador"/><div class="ss-lbl">PROCESSADOR</div></div>
-    <div class="ss" onclick="openLb(this)"><img src="Imagens/IRAM.png" alt="Memória RAM"/><div class="ss-lbl">MEMÓRIA RAM</div></div>
-    <div class="ss" onclick="openLb(this)"><img src="Imagens/IGC.png" alt="Placa de Vídeo"/><div class="ss-lbl">PLACA DE VÍDEO</div></div>
-    <div class="ss" onclick="openLb(this)"><img src="Imagens/ISTORE.png" alt="Armazenamento"/><div class="ss-lbl">ARMAZENAMENTO</div></div>
-    <div class="ss" onclick="openLb(this)"><img src="Imagens/IREDE.png" alt="Rede"/><div class="ss-lbl">REDE</div></div>
-    <div class="ss" onclick="openLb(this)"><img src="Imagens/ITEMP.png" alt="Temperatura"/><div class="ss-lbl">TEMPERATURA</div></div>
-    <div class="ss" onclick="openLb(this)"><img src="Imagens/IGAME.png" alt="Jogos"/><div class="ss-lbl">COMPATIB. DE JOGOS</div></div>
-    <div class="ss" onclick="openLb(this)"><img src="Imagens/IBENCH.png" alt="Benchmark"/><div class="ss-lbl">BENCHMARK</div></div>
-  </div>
-
-  <!-- DOWNLOADS TABLE -->
-  <div class="sec-label">VERSÕES DISPONÍVEIS</div>
-  <div class="dl-section">
-    <div class="dl-header">
-      <div class="dl-count"><span>10</span> VERSÕES DISPONÍVEIS — TODAS GRATUITAS</div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SpecView</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🖥️</text></svg>"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- LIGHTBOX -->
+    <div class="lightbox" id="lightbox" onclick="closeLb()">
+      <div class="lb-close" onclick="closeLb()">ESC / FECHAR</div>
+      <img id="lb-img" src="" alt="" />
     </div>
 
-    <table class="dl-table">
-      <thead>
-        <tr>
-          <th>VERSÃO</th>
-          <th>STATUS</th>
-          <th>O QUE HÁ DE NOVO</th>
-          <th>TAMANHO / DATA</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="dl-tbody">
-        <!-- Gerado via JS -->
-      </tbody>
-    </table>
-  </div>
-
-</div><!-- /page-downloads -->
-
-<!-- ══════════════════ HELP PAGE -->
-<div class="page" id="page-help">
-  <div class="help-container">
-
-    <h2 class="help-page-title">CENTRAL DE<br><span class="ac">AJUDA.</span></h2>
-    <p class="help-page-sub">// documentação e suporte do specview</p>
-
-    <!-- INSTALAÇÃO -->
-    <div class="help-block">
-      <div class="help-block-title">INSTALAÇÃO</div>
-      <div class="steps">
-        <div class="step-row">
-          <div class="step-n">01</div>
+    <!-- CHANGELOG MODAL -->
+    <div class="modal" id="changelog-modal" aria-hidden="true">
+      <div class="modal-backdrop" onclick="closeChangelog()"></div>
+      <div
+        class="modal-box"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="changelog-title"
+      >
+        <div class="modal-header">
           <div>
-            <div class="step-t">Baixe a versão desejada</div>
-            <div class="step-d">Na aba Downloads, localize a versão e clique em "Baixar". O arquivo será salvo na sua pasta de Downloads.</div>
+            <div class="modal-title" id="changelog-title">CHANGELOG</div>
+            <div class="modal-sub" id="changelog-sub">—</div>
           </div>
+          <button
+            class="modal-close"
+            onclick="closeChangelog()"
+            aria-label="Fechar"
+          >
+            ✕
+          </button>
         </div>
-        <div class="step-row">
-          <div class="step-n">02</div>
-          <div>
-            <div class="step-t">Execute o arquivo</div>
-            <div class="step-d">Dê dois cliques no arquivo baixado. O SpecView roda diretamente — sem instalação necessária.</div>
-          </div>
-        </div>
-        <div class="step-row">
-          <div class="step-n">03</div>
-          <div>
-            <div class="step-t">Para temperatura, execute como Administrador</div>
-            <div class="step-d">Clique com o botão direito em <code style="color:var(--neon)">iniciar.bat</code> e selecione "Executar como administrador". Isso libera o acesso aos sensores de temperatura.</div>
-            <div class="step-code">→ Clique direito em iniciar.bat → Executar como administrador</div>
-          </div>
-        </div>
-        <div class="step-row">
-          <div class="step-n">04</div>
-          <div>
-            <div class="step-t">Aguarde o carregamento inicial</div>
-            <div class="step-d">Na primeira execução, o SpecView pode levar alguns segundos para coletar os dados. O indicador "AO VIVO" no canto superior direito confirma que a leitura está ativa.</div>
+
+        <div class="modal-body">
+          <ul class="cl-list" id="changelog-list"></ul>
+          <div class="cl-footer">
+            <a class="cl-link" href="CHANGELOG.md" target="_blank" rel="noreferrer"
+              >Ver changelog completo</a
+            >
           </div>
         </div>
       </div>
     </div>
 
-    <!-- TEMPERATURA N/A -->
-    <div class="help-block">
-      <div class="help-block-title">TEMPERATURA — N/A</div>
-      <div class="steps">
-        <div class="step-row">
-          <div class="step-n">!</div>
-          <div>
-            <div class="step-t">Por que aparece N/A na temperatura?</div>
-            <div class="step-d">A leitura de temperatura exige permissões elevadas no Windows. Se você abriu o SpecView normalmente, os sensores não ficam acessíveis. Feche o app e reabra via <code style="color:var(--neon)">iniciar.bat</code> como administrador para resolver.</div>
+    <!-- HEADER -->
+    <header>
+      <div class="logo">
+        <div class="logo-icon">SV</div>
+        <div>
+          <div class="logo-text">SPEC<span>VIEW</span></div>
+          <div class="logo-sub">HARDWARE MONITOR</div>
+        </div>
+      </div>
+      <nav>
+        <div
+          class="tab active"
+          onclick="switchTab('downloads')"
+          id="tab-downloads"
+        >
+          DOWNLOADS <span class="tab-badge">10</span>
+        </div>
+        <div class="tab" onclick="switchTab('help')" id="tab-help">AJUDA</div>
+      </nav>
+    </header>
+
+    <!-- ══════════════════ DOWNLOADS PAGE -->
+    <div class="page active" id="page-downloads">
+      <!-- HERO -->
+      <div class="hero">
+        <div class="hero-bg-glow"></div>
+        <div class="hero-eyebrow">// monitor de hardware para windows</div>
+        <h1 class="hero-title">
+          SPEC<span class="accent">VIEW</span><br />DOWNLOADS.
+        </h1>
+        <p class="hero-desc">
+          Todas as versões do SpecView em um só lugar. Escolha a versão desejada
+          e clique em baixar.
+        </p>
+        <div class="hero-chips">
+          <div class="chip"><span class="live-dot"></span>AO VIVO</div>
+          <div class="chip">WINDOWS 10 / 11</div>
+          <div class="chip">GRATUITO</div>
+          <div class="chip">x64</div>
+          <div class="chip">ELECTRON</div>
+        </div>
+      </div>
+
+      <!-- SCREENSHOTS -->
+      <div class="sec-label" style="margin-top: 8px">CAPTURAS DE TELA</div>
+      <div class="screenshots">
+        <div class="ss" onclick="openLb(this)">
+          <img src="Imagens/IVG.png" alt="Visão Geral" />
+          <div class="ss-lbl">VISÃO GERAL</div>
+        </div>
+        <div class="ss" onclick="openLb(this)">
+          <img src="Imagens/ICPU.png" alt="Processador" />
+          <div class="ss-lbl">PROCESSADOR</div>
+        </div>
+        <div class="ss" onclick="openLb(this)">
+          <img src="Imagens/IRAM.png" alt="Memória RAM" />
+          <div class="ss-lbl">MEMÓRIA RAM</div>
+        </div>
+        <div class="ss" onclick="openLb(this)">
+          <img src="Imagens/IGC.png" alt="Placa de Vídeo" />
+          <div class="ss-lbl">PLACA DE VÍDEO</div>
+        </div>
+        <div class="ss" onclick="openLb(this)">
+          <img src="Imagens/ISTORE.png" alt="Armazenamento" />
+          <div class="ss-lbl">ARMAZENAMENTO</div>
+        </div>
+        <div class="ss" onclick="openLb(this)">
+          <img src="Imagens/IREDE.png" alt="Rede" />
+          <div class="ss-lbl">REDE</div>
+        </div>
+        <div class="ss" onclick="openLb(this)">
+          <img src="Imagens/ITEMP.png" alt="Temperatura" />
+          <div class="ss-lbl">TEMPERATURA</div>
+        </div>
+        <div class="ss" onclick="openLb(this)">
+          <img src="Imagens/IGAME.png" alt="Jogos" />
+          <div class="ss-lbl">COMPATIB. DE JOGOS</div>
+        </div>
+        <div class="ss" onclick="openLb(this)">
+          <img src="Imagens/IBENCH.png" alt="Benchmark" />
+          <div class="ss-lbl">BENCHMARK</div>
+        </div>
+      </div>
+
+      <!-- DOWNLOADS TABLE -->
+      <div class="sec-label">VERSÕES DISPONÍVEIS</div>
+      <div class="dl-section">
+        <div class="dl-header">
+          <div class="dl-count">
+            <span>10</span> VERSÕES DISPONÍVEIS — TODAS GRATUITAS
+          </div>
+        </div>
+
+        <table class="dl-table">
+          <thead>
+            <tr>
+              <th>VERSÃO</th>
+              <th>STATUS</th>
+              <th>O QUE HÁ DE NOVO</th>
+              <th>TAMANHO / DATA</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="dl-tbody">
+            <!-- Gerado via JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- /page-downloads -->
+
+    <!-- ══════════════════ HELP PAGE -->
+    <div class="page" id="page-help">
+      <div class="help-container">
+        <h2 class="help-page-title">
+          CENTRAL DE<br /><span class="ac">AJUDA.</span>
+        </h2>
+        <p class="help-page-sub">// documentação e suporte do specview</p>
+
+        <!-- INSTALAÇÃO -->
+        <div class="help-block">
+          <div class="help-block-title">INSTALAÇÃO</div>
+          <div class="steps">
+            <div class="step-row">
+              <div class="step-n">01</div>
+              <div>
+                <div class="step-t">Baixe a versão desejada</div>
+                <div class="step-d">
+                  Na aba Downloads, localize a versão e clique em "Baixar". O
+                  arquivo será salvo na sua pasta de Downloads.
+                </div>
+              </div>
+            </div>
+            <div class="step-row">
+              <div class="step-n">02</div>
+              <div>
+                <div class="step-t">Execute o arquivo</div>
+                <div class="step-d">
+                  Dê dois cliques no arquivo baixado. O SpecView roda
+                  diretamente — sem instalação necessária.
+                </div>
+              </div>
+            </div>
+            <div class="step-row">
+              <div class="step-n">03</div>
+              <div>
+                <div class="step-t">
+                  Para temperatura, execute como Administrador
+                </div>
+                <div class="step-d">
+                  Clique com o botão direito em
+                  <code style="color: var(--neon)">iniciar.bat</code> e
+                  selecione "Executar como administrador". Isso libera o acesso
+                  aos sensores de temperatura.
+                </div>
+                <div class="step-code">
+                  → Clique direito em iniciar.bat → Executar como administrador
+                </div>
+              </div>
+            </div>
+            <div class="step-row">
+              <div class="step-n">04</div>
+              <div>
+                <div class="step-t">Aguarde o carregamento inicial</div>
+                <div class="step-d">
+                  Na primeira execução, o SpecView pode levar alguns segundos
+                  para coletar os dados. O indicador "AO VIVO" no canto superior
+                  direito confirma que a leitura está ativa.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TEMPERATURA N/A -->
+        <div class="help-block">
+          <div class="help-block-title">TEMPERATURA — N/A</div>
+          <div class="steps">
+            <div class="step-row">
+              <div class="step-n">!</div>
+              <div>
+                <div class="step-t">Por que aparece N/A na temperatura?</div>
+                <div class="step-d">
+                  A leitura de temperatura exige permissões elevadas no Windows.
+                  Se você abriu o SpecView normalmente, os sensores não ficam
+                  acessíveis. Feche o app e reabra via
+                  <code style="color: var(--neon)">iniciar.bat</code> como
+                  administrador para resolver.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FPS EM JOGOS -->
+        <div class="help-block">
+          <div class="help-block-title">VER FPS EM JOGOS</div>
+          <div class="steps">
+            <div class="step-row">
+              <div class="step-n">01</div>
+              <div>
+                <div class="step-t">Instale o MSI Afterburner + RivaTuner</div>
+                <div class="step-d">
+                  Baixe em
+                  <span style="color: var(--neon)"
+                    >msi.com/Landing/afterburner</span
+                  >. O RivaTuner Statistics Server é incluído automaticamente na
+                  instalação.
+                </div>
+              </div>
+            </div>
+            <div class="step-row">
+              <div class="step-n">02</div>
+              <div>
+                <div class="step-t">Configure o RivaTuner</div>
+                <div class="step-d">
+                  Abra o RivaTuner e ative a opção
+                  <strong style="color: var(--text)"
+                    >Show On-Screen Display</strong
+                  >.
+                </div>
+              </div>
+            </div>
+            <div class="step-row">
+              <div class="step-n">03</div>
+              <div>
+                <div class="step-t">Configure o Afterburner</div>
+                <div class="step-d">
+                  Vá em Configurações → Monitoramento, marque
+                  <strong style="color: var(--text)">Framerate</strong> e ative
+                  "Mostrar no OSD".
+                </div>
+              </div>
+            </div>
+            <div class="step-row">
+              <div class="step-n">04</div>
+              <div>
+                <div class="step-t">Abra qualquer jogo</div>
+                <div class="step-d">
+                  O FPS aparecerá no canto da tela em tempo real, diretamente
+                  dentro do jogo.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- REQUISITOS -->
+        <div class="help-block">
+          <div class="help-block-title">REQUISITOS DO SISTEMA</div>
+          <div class="req-grid">
+            <div class="req-col">
+              <div class="req-col-title">MÍNIMO</div>
+              <div class="req-r">
+                <span class="req-k">Sistema</span
+                ><span class="req-v">Windows 10 x64</span>
+              </div>
+              <div class="req-r">
+                <span class="req-k">RAM</span><span class="req-v">4 GB</span>
+              </div>
+              <div class="req-r">
+                <span class="req-k">Armazenamento</span
+                ><span class="req-v">200 MB</span>
+              </div>
+              <div class="req-r">
+                <span class="req-k">Runtime</span
+                ><span class="req-v">Node.js v18+</span>
+              </div>
+            </div>
+            <div class="req-col">
+              <div class="req-col-title">RECOMENDADO</div>
+              <div class="req-r">
+                <span class="req-k">Sistema</span
+                ><span class="req-v">Windows 11 x64</span>
+              </div>
+              <div class="req-r">
+                <span class="req-k">RAM</span><span class="req-v">8 GB</span>
+              </div>
+              <div class="req-r">
+                <span class="req-k">Armazenamento</span
+                ><span class="req-v">500 MB</span>
+              </div>
+              <div class="req-r">
+                <span class="req-k">Permissão</span
+                ><span class="req-v">Administrador</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FAQ -->
+        <div class="help-block">
+          <div class="help-block-title">PERGUNTAS FREQUENTES</div>
+          <div class="faq">
+            <div class="faq-item">
+              <div class="faq-q" onclick="toggleFaq(this)">
+                O SpecView é gratuito?
+              </div>
+              <div class="faq-a">
+                Sim, todas as versões são completamente gratuitas para uso
+                pessoal.
+              </div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-q" onclick="toggleFaq(this)">
+                Por que a GPU aparece como Intel Iris Xe e não minha placa
+                dedicada?
+              </div>
+              <div class="faq-a">
+                O SpecView exibe a GPU reportada como padrão pelo sistema. Em
+                notebooks com GPU integrada e dedicada, o Windows pode reportar
+                a integrada como principal. Isso é um comportamento do driver,
+                não um bug do SpecView.
+              </div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-q" onclick="toggleFaq(this)">
+                Posso ter várias versões instaladas ao mesmo tempo?
+              </div>
+              <div class="faq-a">
+                Sim, cada versão é um arquivo independente. Você pode manter
+                múltiplas versões na mesma máquina sem nenhum conflito.
+              </div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-q" onclick="toggleFaq(this)">
+                O SpecView afeta a performance do PC?
+              </div>
+              <div class="faq-a">
+                O impacto é mínimo — consumo de CPU abaixo de 2% em uso normal.
+                Você pode conferir isso na própria lista de processos dentro do
+                SpecView (o processo electron.exe).
+              </div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-q" onclick="toggleFaq(this)">
+                Como reportar um bug ou sugerir uma funcionalidade?
+              </div>
+              <div class="faq-a">
+                Abra uma issue no repositório do GitHub do projeto. Inclua
+                detalhes do seu hardware, versão do Windows e passos para
+                reproduzir o problema.
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
+    <!-- /page-help -->
 
-    <!-- FPS EM JOGOS -->
-    <div class="help-block">
-      <div class="help-block-title">VER FPS EM JOGOS</div>
-      <div class="steps">
-        <div class="step-row">
-          <div class="step-n">01</div>
-          <div>
-            <div class="step-t">Instale o MSI Afterburner + RivaTuner</div>
-            <div class="step-d">Baixe em <span style="color:var(--neon)">msi.com/Landing/afterburner</span>. O RivaTuner Statistics Server é incluído automaticamente na instalação.</div>
-          </div>
-        </div>
-        <div class="step-row">
-          <div class="step-n">02</div>
-          <div>
-            <div class="step-t">Configure o RivaTuner</div>
-            <div class="step-d">Abra o RivaTuner e ative a opção <strong style="color:var(--text)">Show On-Screen Display</strong>.</div>
-          </div>
-        </div>
-        <div class="step-row">
-          <div class="step-n">03</div>
-          <div>
-            <div class="step-t">Configure o Afterburner</div>
-            <div class="step-d">Vá em Configurações → Monitoramento, marque <strong style="color:var(--text)">Framerate</strong> e ative "Mostrar no OSD".</div>
-          </div>
-        </div>
-        <div class="step-row">
-          <div class="step-n">04</div>
-          <div>
-            <div class="step-t">Abra qualquer jogo</div>
-            <div class="step-d">O FPS aparecerá no canto da tela em tempo real, diretamente dentro do jogo.</div>
-          </div>
-        </div>
+    <footer>
+      <div class="ft">
+        <span>SPECVIEW</span> — Monitor de Hardware Windows · Desenvolvido por
+        <span>MZ Apps</span>
       </div>
-    </div>
+      <div class="ft">© 2025 · Todas as versões gratuitas</div>
+    </footer>
 
-    <!-- REQUISITOS -->
-    <div class="help-block">
-      <div class="help-block-title">REQUISITOS DO SISTEMA</div>
-      <div class="req-grid">
-        <div class="req-col">
-          <div class="req-col-title">MÍNIMO</div>
-          <div class="req-r"><span class="req-k">Sistema</span><span class="req-v">Windows 10 x64</span></div>
-          <div class="req-r"><span class="req-k">RAM</span><span class="req-v">4 GB</span></div>
-          <div class="req-r"><span class="req-k">Armazenamento</span><span class="req-v">200 MB</span></div>
-          <div class="req-r"><span class="req-k">Runtime</span><span class="req-v">Node.js v18+</span></div>
-        </div>
-        <div class="req-col">
-          <div class="req-col-title">RECOMENDADO</div>
-          <div class="req-r"><span class="req-k">Sistema</span><span class="req-v">Windows 11 x64</span></div>
-          <div class="req-r"><span class="req-k">RAM</span><span class="req-v">8 GB</span></div>
-          <div class="req-r"><span class="req-k">Armazenamento</span><span class="req-v">500 MB</span></div>
-          <div class="req-r"><span class="req-k">Permissão</span><span class="req-v">Administrador</span></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- FAQ -->
-    <div class="help-block">
-      <div class="help-block-title">PERGUNTAS FREQUENTES</div>
-      <div class="faq">
-        <div class="faq-item">
-          <div class="faq-q" onclick="toggleFaq(this)">O SpecView é gratuito?</div>
-          <div class="faq-a">Sim, todas as versões são completamente gratuitas para uso pessoal.</div>
-        </div>
-        <div class="faq-item">
-          <div class="faq-q" onclick="toggleFaq(this)">Por que a GPU aparece como Intel Iris Xe e não minha placa dedicada?</div>
-          <div class="faq-a">O SpecView exibe a GPU reportada como padrão pelo sistema. Em notebooks com GPU integrada e dedicada, o Windows pode reportar a integrada como principal. Isso é um comportamento do driver, não um bug do SpecView.</div>
-        </div>
-        <div class="faq-item">
-          <div class="faq-q" onclick="toggleFaq(this)">Posso ter várias versões instaladas ao mesmo tempo?</div>
-          <div class="faq-a">Sim, cada versão é um arquivo independente. Você pode manter múltiplas versões na mesma máquina sem nenhum conflito.</div>
-        </div>
-        <div class="faq-item">
-          <div class="faq-q" onclick="toggleFaq(this)">O SpecView afeta a performance do PC?</div>
-          <div class="faq-a">O impacto é mínimo — consumo de CPU abaixo de 2% em uso normal. Você pode conferir isso na própria lista de processos dentro do SpecView (o processo electron.exe).</div>
-        </div>
-        <div class="faq-item">
-          <div class="faq-q" onclick="toggleFaq(this)">Como reportar um bug ou sugerir uma funcionalidade?</div>
-          <div class="faq-a">Abra uma issue no repositório do GitHub do projeto. Inclua detalhes do seu hardware, versão do Windows e passos para reproduzir o problema.</div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div><!-- /page-help -->
-
-<footer>
-  <div class="ft"><span>SPECVIEW</span> — Monitor de Hardware Windows · Desenvolvido por <span>MZ Apps</span></div>
-  <div class="ft">© 2025 · Todas as versões gratuitas</div>
-</footer>
-
-<script src="script.js"></script>
-
-</body>
+    <script src="script.js"></script>
+  </body>
 </html>

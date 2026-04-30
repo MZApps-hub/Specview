@@ -19,6 +19,7 @@ Este repositório contém:
 
 - **App (Electron)**: `SpecView-v5/specview5/`
 - **Página estática de downloads/ajuda**: `index.html` (raiz)
+- **Changelog das versões**: `CHANGELOG.md` (raiz)
 
 O app em si está concentrado em:
 

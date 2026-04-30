@@ -501,6 +501,79 @@ td:last-child { text-align: right; }
 .lb-close { position: absolute; top: 18px; right: 22px; font-family: var(--fm); font-size: 0.65rem; color: var(--text3); letter-spacing: 0.15em; cursor: pointer; padding: 7px 14px; border: 1px solid var(--border2); }
 .lb-close:hover { color: var(--text); border-color: var(--text3); }
 
+/* CHANGELOG MODAL */
+.modal { position: fixed; inset: 0; z-index: 1100; display: none; }
+.modal.open { display: grid; place-items: center; }
+.modal-backdrop { position: absolute; inset: 0; background: rgba(3,11,18,0.92); backdrop-filter: blur(6px); }
+.modal-box {
+  position: relative;
+  width: min(760px, calc(100vw - 32px));
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  box-shadow: 0 0 0 1px rgba(0,212,255,0.06), 0 30px 80px rgba(0,0,0,0.55);
+  z-index: 1;
+}
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.modal-title {
+  font-family: var(--fd);
+  font-size: 0.82rem;
+  letter-spacing: 0.18em;
+  color: var(--neon);
+}
+.modal-sub {
+  margin-top: 6px;
+  font-family: var(--fm);
+  font-size: 0.66rem;
+  color: var(--text3);
+  letter-spacing: 0.08em;
+}
+.modal-close {
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--text3);
+  cursor: pointer;
+  padding: 6px 10px;
+  font-family: var(--fm);
+  letter-spacing: 0.08em;
+}
+.modal-close:hover { color: var(--text); border-color: var(--text3); }
+.modal-body { padding: 14px 20px 18px; }
+.cl-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.cl-list li {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+  font-family: var(--fm);
+  font-size: 0.72rem;
+  color: var(--text2);
+  line-height: 1.7;
+}
+.cl-list li::before { content: '→ '; color: var(--neon); opacity: 0.65; }
+.cl-footer { display: flex; justify-content: flex-end; margin-top: 14px; }
+.cl-link {
+  font-family: var(--fm);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  color: var(--neon);
+  text-decoration: none;
+  border: 1px solid var(--border2);
+  padding: 8px 12px;
+}
+.cl-link:hover { color: var(--bg); background: var(--neon); border-color: var(--neon); }
+
 /* FOOTER */
 footer {
   position: relative; z-index: 10;
