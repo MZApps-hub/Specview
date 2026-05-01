@@ -1,0 +1,13 @@
+#pastas
+specview-v5/
+specview-v4/
+specview-v3/
+specview-v2/
+specview-v1/
+
+#arquivos   
+node_modules/
+package-lock.json
+package.json
+
+
